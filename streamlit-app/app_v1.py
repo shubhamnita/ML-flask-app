@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 
-st.title('Who survived Titanic Crash - Jake or Rose')
+st.title('Who survived Titanic - Jake or Rose')
 
 # Load the dataset in a dataframe object and include only four features as mentioned
 
@@ -13,17 +13,20 @@ def main():
 	data_load_state = st.text('Loading data...')
 	data = load_data(1000)
 	data_load_state.text('Loading data... done!')
-	if st.checkbox('Show raw data'):
+	st.sidebar.header('Options')
+	if st.sidebar.checkbox('Show raw data'):
 		st.subheader('Kaggle Titanic Dataset')
 		st.write(data)
-	st.subheader('Feature and Target Columns Selection')
-	feature_columns = st.multiselect('Feature-Columns',data.columns)
+	'''	
+	## Feature and Target Columns Selection
+	'''
+	feature_columns = st.sidebar.multiselect('Feature-Columns',data.columns)
 	st.write(feature_columns)
-	dependent_variable = st.selectbox('Target Column',data.columns)
+	dependent_variable = st.sidebar.selectbox('Target Column',data.columns)
 	include = feature_columns
 	include.append(dependent_variable)
 	df_ = data[include]
-	if st.checkbox('Show filtered data'):
+	if st.sidebar.checkbox('Show filtered data'):
 		st.subheader('Filtered data')
 		st.write(df_)
 		
@@ -34,7 +37,7 @@ def main():
 	na_remove_state = st.text('Removing Null values...')
 	df_.dropna(axis=0,inplace=True)
 	na_remove_state.text('Removed Null values... done!')
-	if st.checkbox('Show filtered data after null values removal'):
+	if st.sidebar.checkbox('Show filtered data after null values removal'):
 		st.subheader('Filtered data')
 		st.write(df_)
 
@@ -46,11 +49,12 @@ def main():
 			df_[col].fillna(0, inplace=True)
 
 	df_ohe = pd.get_dummies(df_, columns=categoricals)
-	if st.checkbox('Show filtered data after handling categorical data'):
+	if st.sidebar.checkbox('Show filtered data after handling categorical data'):
 		st.subheader('Filtered data')
 		st.write(df_ohe)
 
-	if st.checkbox('Train the classification model'):
+	if st.sidebar.checkbox('Train the classification model'):
+		p_holder = st.empty()
 		algorithm = st.selectbox('Classification Algorithm',['LogisticRegression'])
 		dependent_variable = 'survived'
 		if dependent_variable in df_ohe.columns:
@@ -58,11 +62,13 @@ def main():
 			y = df_ohe[dependent_variable]
 			model = train_model(x,y)
 
-	if st.checkbox('Want to predict'):
+	if st.sidebar.checkbox('Want to predict'):
 		st.subheader('Enter Test data')
 		test_data ={}
 		for var in df_ohe.columns.difference([dependent_variable]):
-			test_data[var] = int(st.text_input(var))
+			
+			test_data[var] = int(st.text_input(var),10)
+			
 
 		#st.write(test_data)
 		#test_df = pd.DataFrame(test_data,columns=df_ohe.columns.difference([dependent_variable]))
